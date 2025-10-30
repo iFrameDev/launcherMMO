@@ -24,4 +24,4 @@ jobs:
         with:
           files: "dist/*.exe,dist/*.zip"
         env:
-          GITHUB_TOKEN: ${{ secrets.LAUNCHER_MMO_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
