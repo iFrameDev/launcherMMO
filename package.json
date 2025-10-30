@@ -1,0 +1,66 @@
+{
+  "name": "novra-launcher",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Launcher minimaliste et moderne pour Novra (Electron + Tailwind)",
+  "main": "dist/main.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "dev": "concurrently \"tsc -w\" \"wait-on dist/main.js && electron .\"",
+    "start": "npm run build && electron .",
+    "build": "tsc -p .",
+    "dist": "npm run build && electron-builder --dir",
+    "release": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "concurrently": "^9.0.1",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.6.0",
+    "typescript": "^5.6.3",
+    "wait-on": "^7.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OWNER/REPO.git"
+  },
+  "build": {
+    "appId": "com.novra.launcher",
+    "productName": "Novra Launcher",
+    "files": [
+      "dist/**",
+      "index.html",
+      "assets/**",
+      "images/**"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "images/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Novra Launcher"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "OWNER",
+        "repo": "REPO"
+      }
+    ]
+  }
+}
