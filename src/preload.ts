@@ -7,6 +7,7 @@ export type LauncherAPI = {
   launch: (args?: string) => Promise<boolean>;
   minimize: () => Promise<void>;
   close: () => Promise<void>;
+  getVersion: () => Promise<string>;
 };
 
 const api: LauncherAPI = {
@@ -16,6 +17,7 @@ const api: LauncherAPI = {
   launch: (args?: string) => ipcRenderer.invoke('game:launch', args),
   minimize: () => ipcRenderer.invoke('window:minimize'),
   close: () => ipcRenderer.invoke('window:close'),
+  getVersion: () => ipcRenderer.invoke('app:version'),
 };
 
 declare global {

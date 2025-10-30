@@ -56,6 +56,13 @@ async function init() {
     showOnly('homePanel');
   });
 
+  // Display app version
+  try {
+    const v = await window.launcher.getVersion();
+    const verEl = document.getElementById('appVersion');
+    if (verEl) verEl.textContent = `v${v}`;
+  } catch {}
+
   // Handlers (settings)
   $('#chooseBtn')?.addEventListener('click', async () => {
     const chosen = await window.launcher.chooseExecutable();

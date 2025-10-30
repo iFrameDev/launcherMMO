@@ -71,7 +71,7 @@ app.whenReady().then(() => {
   if (app.isPackaged) {
     try {
       autoUpdater.autoDownload = true;
-      autoUpdater.autoInstallOnAppQuit = true;
+      autoUpdater.autoInstallOnAppQuit = false; // on installe immédiatement après le téléchargement
 
       autoUpdater.on('update-available', () => {
         if (mainWindow) {
@@ -95,7 +95,8 @@ app.whenReady().then(() => {
         if (mainWindow) {
           mainWindow.webContents.send('updater:event', { type: 'update-downloaded' });
         }
-        // Installe au quit; possibilité d'appeler quitAndInstall via IPC
+        // Installe et redémarre immédiatement une fois l'update téléchargée
+        autoUpdater.quitAndInstall(false, true);
       });
 
       autoUpdater.on('error', (err) => {
@@ -104,7 +105,8 @@ app.whenReady().then(() => {
         }
       });
 
-      autoUpdater.checkForUpdatesAndNotify();
+      // Vérifie au démarrage; pas de notification, on installe directement
+      autoUpdater.checkForUpdates();
     } catch (_) {
       // Ignore updater errors in dev
     }
@@ -178,6 +180,11 @@ ipcMain.handle('updater:check', async () => {
 ipcMain.handle('updater:quitAndInstall', () => {
   if (!app.isPackaged) return;
   autoUpdater.quitAndInstall(false, true);
+});
+
+// App info IPC
+ipcMain.handle('app:version', () => {
+  return app.getVersion();
 });
 
 
