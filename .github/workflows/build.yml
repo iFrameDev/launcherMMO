@@ -1,4 +1,4 @@
-name: Build Electron Launcher
+name: Build and Publish Electron Launcher
 
 on:
   push:
@@ -9,19 +9,23 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
+      # Récupérer le code du repo
       - uses: actions/checkout@v3
+
+      # Installer Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
+
+      # Installer les dépendances
       - name: Install dependencies
         run: npm install
-      - name: Build
+
+      # Build et publication avec Electron Builder
+      - name: Build and Publish
         run: npm run release
-      - name: Publish Release Assets
-        uses: softprops/action-gh-release@v1
-        with:
-          files: "dist/*.exe,dist/*.zip"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
