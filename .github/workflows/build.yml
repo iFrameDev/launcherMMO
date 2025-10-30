@@ -1,0 +1,27 @@
+name: Build Electron Launcher
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run release
+      - name: Publish Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "dist/*.exe,dist/*.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.LAUNCHER_MMO_TOKEN }}

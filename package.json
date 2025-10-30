@@ -1,6 +1,6 @@
 {
   "name": "novra-launcher",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Launcher minimaliste et moderne pour Novra (Electron + Tailwind)",
   "main": "dist/main.js",
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/OWNER/REPO.git"
+    "url": "https://github.com/iFrameDev/launcherMMO.git"
   },
   "build": {
     "appId": "com.novra.launcher",
@@ -58,8 +58,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "OWNER",
-        "repo": "REPO"
+        "owner": "iFrameDev",
+        "repo": "launcherMMO"
       }
     ]
   }
