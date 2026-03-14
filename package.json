@@ -1,8 +1,8 @@
 {
-  "name": "novra-launcher",
-  "version": "0.1.4",
+  "name": "palmlife-launcher",
+  "version": "0.1.5",
   "private": true,
-  "description": "Launcher minimaliste et moderne pour Novra (Electron + Tailwind)",
+  "description": "Launcher minimaliste et moderne pour PalmLife (Electron + Tailwind)",
   "main": "dist/main.js",
   "author": "",
   "license": "MIT",
@@ -30,8 +30,8 @@
     "url": "https://github.com/iFrameDev/launcherMMO.git"
   },
   "build": {
-    "appId": "com.novra.launcher",
-    "productName": "Novra Launcher",
+    "appId": "com.palmlife.launcher",
+    "productName": "PalmLife Launcher",
     "files": [
       "dist/**",
       "index.html",
@@ -54,7 +54,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Novra Launcher"
+      "shortcutName": "PalmLife Launcher"
     },
     "publish": [
       {

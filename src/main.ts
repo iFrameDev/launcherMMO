@@ -41,7 +41,7 @@ async function createWindow() {
     width: 1280,
     height: 720,
     resizable: false,
-    title: 'Novra Launcher',
+    title: 'PalmLife Launcher',
     autoHideMenuBar: true,
     frame: false,
     transparent: true,
@@ -131,7 +131,7 @@ ipcMain.handle('config:set', (_evt, config: LauncherConfig) => {
 
 ipcMain.handle('dialog:chooseExecutable', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
-    title: 'Choisir l\'exécutable de Novra',
+    title: 'Choisir l\'exécutable de PalmLife',
     properties: ['openFile'],
     filters: [
       { name: 'Exécutables', extensions: process.platform === 'win32' ? ['exe'] : ['*'] },
