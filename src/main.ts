@@ -1,8 +1,14 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { join } from 'path';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, appendFileSync } from 'fs';
 import { spawn } from 'child_process';
+
+function log(msg: string) {
+  const logPath = join(app.getPath('userData'), 'updater.log');
+  const line = `[${new Date().toISOString()}] ${msg}\n`;
+  try { appendFileSync(logPath, line, 'utf-8'); } catch {}
+}
 
 type LauncherConfig = {
   gameExecutablePath?: string;
@@ -68,18 +74,29 @@ app.whenReady().then(() => {
   });
 
   // Auto-update: uniquement en build packagé
+  log('App started, isPackaged=' + app.isPackaged + ', version=' + app.getVersion());
   if (app.isPackaged) {
     try {
       autoUpdater.autoDownload = true;
-      autoUpdater.autoInstallOnAppQuit = false; // on installe immédiatement après le téléchargement
+      autoUpdater.autoInstallOnAppQuit = false;
 
-      autoUpdater.on('update-available', () => {
+      autoUpdater.on('checking-for-update', () => {
+        log('Checking for update...');
+      });
+
+      autoUpdater.on('update-not-available', () => {
+        log('No update available');
+      });
+
+      autoUpdater.on('update-available', (info) => {
+        log('Update available: ' + JSON.stringify(info));
         if (mainWindow) {
           mainWindow.webContents.send('updater:event', { type: 'update-available' });
         }
       });
 
       autoUpdater.on('download-progress', (progress) => {
+        log('Download progress: ' + Math.round(progress.percent) + '%');
         if (mainWindow) {
           mainWindow.webContents.send('updater:event', {
             type: 'download-progress',
@@ -92,21 +109,23 @@ app.whenReady().then(() => {
       });
 
       autoUpdater.on('update-downloaded', () => {
+        log('Update downloaded');
         if (mainWindow) {
           mainWindow.webContents.send('updater:event', { type: 'update-downloaded' });
         }
       });
 
       autoUpdater.on('error', (err) => {
+        log('Updater error: ' + String(err));
         if (mainWindow) {
           mainWindow.webContents.send('updater:event', { type: 'error', message: String(err) });
         }
       });
 
-      // Vérifie au démarrage; pas de notification, on installe directement
+      log('Calling checkForUpdates...');
       autoUpdater.checkForUpdates();
-    } catch (_) {
-      // Ignore updater errors in dev
+    } catch (e) {
+      log('Updater catch error: ' + String(e));
     }
   }
 });
