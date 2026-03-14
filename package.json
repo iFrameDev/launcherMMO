@@ -1,6 +1,6 @@
 {
   "name": "palmlife-launcher",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "private": true,
   "description": "Launcher minimaliste et moderne pour PalmLife (Electron + Tailwind)",
   "main": "dist/main.js",

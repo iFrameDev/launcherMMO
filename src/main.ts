@@ -95,8 +95,6 @@ app.whenReady().then(() => {
         if (mainWindow) {
           mainWindow.webContents.send('updater:event', { type: 'update-downloaded' });
         }
-        // Installe et redémarre immédiatement une fois l'update téléchargée
-        autoUpdater.quitAndInstall(false, true);
       });
 
       autoUpdater.on('error', (err) => {

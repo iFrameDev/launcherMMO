@@ -15,13 +15,57 @@ function setShellVisible(visible: boolean) {
 function hidePanel(el: HTMLElement | null) {
   if (!el) return;
   el.classList.add('hidden');
-  el.style.display = 'none';
 }
 
 function showPanel(el: HTMLElement | null) {
   if (!el) return;
   el.classList.remove('hidden');
-  el.style.display = '';
+}
+
+// --- Toast notification system ---
+function showToast(message: string, type: 'info' | 'success' | 'error' = 'info', duration = 4000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const colors = {
+    info: 'border-violet-500/50 bg-violet-500/20',
+    success: 'border-emerald-500/50 bg-emerald-500/20',
+    error: 'border-red-500/50 bg-red-500/20',
+  };
+
+  const toast = document.createElement('div');
+  toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl border ${colors[type]} backdrop-blur-md text-sm text-white/90 shadow-lg transition-all duration-300 translate-x-full opacity-0`;
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.remove('translate-x-full', 'opacity-0');
+  });
+
+  if (duration > 0) {
+    setTimeout(() => {
+      toast.classList.add('translate-x-full', 'opacity-0');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+
+  return toast;
+}
+
+// --- Sidebar active state ---
+let activeNavId = 'btnHome';
+
+function setActiveNav(btnId: string) {
+  activeNavId = btnId;
+  ['btnHome', 'btnCommunity', 'btnSettings'].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    if (id === btnId) {
+      btn.classList.add('bg-white/15');
+    } else {
+      btn.classList.remove('bg-white/15');
+    }
+  });
 }
 
 function showOnly(id: string) {
@@ -31,16 +75,29 @@ function showOnly(id: string) {
   const friends = document.getElementById('friendsPanel');
   [home, settings, login, friends].forEach(hidePanel);
   const target = document.getElementById(id);
-  showPanel(target as HTMLElement | null);
+  showPanel(target);
   if (id === 'loginPanel') setShellVisible(false); else setShellVisible(true);
 }
 
+// --- Update progress bar ---
+function setDownloadProgress(percent: number) {
+  const bar = document.getElementById('downloadBar');
+  const container = document.getElementById('downloadContainer');
+  const label = document.getElementById('downloadLabel');
+  if (bar) bar.style.width = `${Math.round(percent)}%`;
+  if (container) container.classList.remove('hidden');
+  if (label) label.textContent = `${Math.round(percent)}%`;
+}
+
+function hideDownloadBar() {
+  const container = document.getElementById('downloadContainer');
+  if (container) container.classList.add('hidden');
+}
+
 async function init() {
-  // Start on login-only view
   setShellVisible(false);
   showOnly('loginPanel');
 
-  // Load config early for settings page
   const cfg = await window.launcher.getConfig();
   if (cfg.gameExecutablePath) {
     setText('#pathLabel', cfg.gameExecutablePath);
@@ -51,9 +108,18 @@ async function init() {
     if (input) input.value = cfg.launchArgs;
   }
 
-  // Simulated login
+  // Login with loading feedback
   $('#loginSubmit')?.addEventListener('click', () => {
-    showOnly('homePanel');
+    const btn = $('#loginSubmit') as HTMLButtonElement | null;
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = 'Connexion...';
+    setTimeout(() => {
+      showOnly('homePanel');
+      setActiveNav('btnHome');
+      btn.disabled = false;
+      btn.textContent = 'Se connecter';
+    }, 800);
   });
 
   // Display app version
@@ -63,41 +129,98 @@ async function init() {
     if (verEl) verEl.textContent = `v${v}`;
   } catch {}
 
-  // Handlers (settings)
+  // Settings: choose executable
   $('#chooseBtn')?.addEventListener('click', async () => {
-    const chosen = await window.launcher.chooseExecutable();
-    if (!chosen) return;
-    await window.launcher.setConfig({ gameExecutablePath: chosen });
-    setText('#pathLabel', chosen);
-    ($('#playBtn') as HTMLButtonElement | null)?.removeAttribute('disabled');
-  });
-
-  $('#saveArgsBtn')?.addEventListener('click', async () => {
-    const input = document.getElementById('argsInput') as HTMLInputElement | null;
-    await window.launcher.setConfig({ launchArgs: input?.value ?? '' });
-    const msg = $('#savedNote');
-    if (msg) {
-      msg.classList.remove('hidden');
-      setTimeout(() => msg.classList.add('hidden'), 1500);
+    try {
+      const chosen = await window.launcher.chooseExecutable();
+      if (!chosen) return;
+      await window.launcher.setConfig({ gameExecutablePath: chosen });
+      setText('#pathLabel', chosen);
+      ($('#playBtn') as HTMLButtonElement | null)?.removeAttribute('disabled');
+      showToast('Chemin du jeu enregistré', 'success');
+    } catch (e) {
+      showToast('Erreur lors de la sélection du fichier', 'error');
     }
   });
 
-  $('#playBtn')?.addEventListener('click', async () => {
+  // Settings: save args
+  $('#saveArgsBtn')?.addEventListener('click', async () => {
     const input = document.getElementById('argsInput') as HTMLInputElement | null;
-    await window.launcher.launch(input?.value ?? '');
+    await window.launcher.setConfig({ launchArgs: input?.value ?? '' });
+    showToast('Arguments sauvegardés', 'success');
   });
 
-  // Sidebar nav
-  $('#btnSettings')?.addEventListener('click', () => showOnly('settingsPanel'));
-  $('#btnHome')?.addEventListener('click', () => showOnly('homePanel'));
-  $('#btnCommunity')?.addEventListener('click', () => showOnly('friendsPanel'));
+  // Play button
+  $('#playBtn')?.addEventListener('click', async () => {
+    try {
+      const input = document.getElementById('argsInput') as HTMLInputElement | null;
+      await window.launcher.launch(input?.value ?? '');
+      showToast('Jeu lancé !', 'success');
+    } catch (e: any) {
+      showToast(e?.message ?? 'Impossible de lancer le jeu', 'error');
+    }
+  });
+
+  // Sidebar nav with active state
+  $('#btnSettings')?.addEventListener('click', () => {
+    showOnly('settingsPanel');
+    setActiveNav('btnSettings');
+  });
+  $('#btnHome')?.addEventListener('click', () => {
+    showOnly('homePanel');
+    setActiveNav('btnHome');
+  });
+  $('#btnCommunity')?.addEventListener('click', () => {
+    showOnly('friendsPanel');
+    setActiveNav('btnCommunity');
+  });
 
   // Window controls
   $('#winMin')?.addEventListener('click', () => window.launcher.minimize());
   $('#winClose')?.addEventListener('click', () => window.launcher.close());
+
+  // Check for updates button in settings
+  $('#checkUpdateBtn')?.addEventListener('click', async () => {
+    showToast('Recherche de mises à jour...', 'info');
+    try {
+      const res = await window.launcher.checkForUpdates();
+      if (!res.ok) {
+        showToast(res.reason === 'dev' ? 'Auto-update désactivé en mode développement' : 'Erreur: ' + res.reason, 'error');
+      }
+    } catch {
+      showToast('Impossible de vérifier les mises à jour', 'error');
+    }
+  });
+
+  // Updater events
+  let updateToast: HTMLElement | null = null;
+
+  window.launcher.onUpdaterEvent((event) => {
+    switch (event.type) {
+      case 'update-available':
+        showToast('Mise à jour disponible, téléchargement en cours...', 'info', 6000);
+        break;
+
+      case 'download-progress':
+        setDownloadProgress(event.percent);
+        break;
+
+      case 'update-downloaded':
+        hideDownloadBar();
+        updateToast = showToast('Mise à jour prête ! Cliquez ici pour redémarrer.', 'success', 0) ?? null;
+        if (updateToast) {
+          updateToast.classList.add('cursor-pointer', 'hover:brightness-110');
+          updateToast.addEventListener('click', () => {
+            window.launcher.quitAndInstall();
+          });
+        }
+        break;
+
+      case 'error':
+        showToast('Erreur de mise à jour: ' + event.message, 'error');
+        break;
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);
-
-
-
