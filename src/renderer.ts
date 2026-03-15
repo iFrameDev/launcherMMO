@@ -192,31 +192,54 @@ async function init() {
     }
   });
 
-  // Updater events
-  let updateToast: HTMLElement | null = null;
+  // Updater events — full screen overlay
+  const updateOverlay = document.getElementById('updateOverlay');
+  const updateProgressBar = document.getElementById('updateProgressBar');
+  const updatePercent = document.getElementById('updatePercent');
+  const updateStatus = document.getElementById('updateStatus');
+
+  function showUpdateOverlay() {
+    if (updateOverlay) updateOverlay.classList.remove('hidden');
+  }
+
+  function formatBytes(bytes: number): string {
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
 
   window.launcher.onUpdaterEvent((event) => {
     switch (event.type) {
       case 'update-available':
-        showToast('Mise à jour disponible, téléchargement en cours...', 'info', 6000);
+        showUpdateOverlay();
         break;
 
-      case 'download-progress':
+      case 'download-progress': {
+        showUpdateOverlay();
+        const pct = Math.round(event.percent);
+        if (updateProgressBar) updateProgressBar.style.width = `${pct}%`;
+        if (updatePercent) updatePercent.textContent = `${pct}%`;
+        if (updateStatus) {
+          const speed = formatBytes(event.bytesPerSecond) + '/s';
+          const downloaded = formatBytes(event.transferred);
+          const total = formatBytes(event.total);
+          updateStatus.textContent = `${downloaded} / ${total} — ${speed}`;
+        }
         setDownloadProgress(event.percent);
         break;
+      }
 
       case 'update-downloaded':
         hideDownloadBar();
-        updateToast = showToast('Mise à jour prête ! Cliquez ici pour redémarrer.', 'success', 0) ?? null;
-        if (updateToast) {
-          updateToast.classList.add('cursor-pointer', 'hover:brightness-110');
-          updateToast.addEventListener('click', () => {
-            window.launcher.quitAndInstall();
-          });
-        }
+        if (updateProgressBar) updateProgressBar.style.width = '100%';
+        if (updatePercent) updatePercent.textContent = '100%';
+        if (updateStatus) updateStatus.textContent = 'Installation en cours...';
+        setTimeout(() => {
+          window.launcher.quitAndInstall();
+        }, 2000);
         break;
 
       case 'error':
+        if (updateOverlay) updateOverlay.classList.add('hidden');
         showToast('Erreur de mise à jour: ' + event.message, 'error');
         break;
     }

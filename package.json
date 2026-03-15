@@ -1,8 +1,8 @@
 {
-  "name": "palmlife-launcher",
-  "version": "0.1.8",
+  "name": "sociallife-launcher",
+  "version": "0.1.9",
   "private": true,
-  "description": "Launcher minimaliste et moderne pour PalmLife (Electron + Tailwind)",
+  "description": "Launcher minimaliste et moderne pour Social Life (Electron + Tailwind)",
   "main": "dist/main.js",
   "author": "",
   "license": "MIT",
@@ -30,8 +30,8 @@
     "url": "https://github.com/iFrameDev/launcherMMO.git"
   },
   "build": {
-    "appId": "com.palmlife.launcher",
-    "productName": "PalmLife Launcher",
+    "appId": "com.sociallife.launcher",
+    "productName": "Social Life Launcher",
     "files": [
       "dist/**",
       "index.html",
@@ -54,7 +54,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "PalmLife Launcher"
+      "shortcutName": "Social Life Launcher"
     },
     "publish": [
       {

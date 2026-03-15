@@ -47,7 +47,7 @@ async function createWindow() {
     width: 1280,
     height: 720,
     resizable: false,
-    title: 'PalmLife Launcher',
+    title: 'Social Life Launcher',
     autoHideMenuBar: true,
     frame: false,
     transparent: true,
@@ -148,7 +148,7 @@ ipcMain.handle('config:set', (_evt, config: LauncherConfig) => {
 
 ipcMain.handle('dialog:chooseExecutable', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
-    title: 'Choisir l\'exécutable de PalmLife',
+    title: 'Choisir l\'exécutable de Social Life',
     properties: ['openFile'],
     filters: [
       { name: 'Exécutables', extensions: process.platform === 'win32' ? ['exe'] : ['*'] },
