@@ -1,15 +1,15 @@
 {
   "name": "sociallife-launcher",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "private": true,
-  "description": "Launcher minimaliste et moderne pour Social Life (Electron + Tailwind)",
-  "main": "dist/main.js",
+  "description": "Launcher minimaliste et moderne pour Social Life (Electron + React + Tailwind)",
+  "main": "dist/main/main.js",
   "author": "",
   "license": "MIT",
   "scripts": {
-    "dev": "concurrently \"tsc -w\" \"wait-on dist/main.js && electron .\"",
+    "dev": "concurrently \"tsc -p tsconfig.node.json -w\" \"vite dev\" \"wait-on dist/main/main.js && VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "start": "npm run build && electron .",
-    "build": "tsc -p .",
+    "build": "tsc -p tsconfig.node.json && vite build",
     "dist": "npm run build && electron-builder --dir",
     "release": "npm run build && electron-builder"
   },
@@ -18,11 +18,20 @@
   },
   "devDependencies": {
     "@types/node": "^22.7.4",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "^10.4.27",
     "concurrently": "^9.0.1",
     "dotenv-cli": "^11.0.0",
     "electron": "^30.0.0",
     "electron-builder": "^24.6.0",
+    "postcss": "^8.5.8",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5.6.3",
+    "vite": "^8.0.0",
     "wait-on": "^7.2.0"
   },
   "repository": {
@@ -33,13 +42,10 @@
     "appId": "com.sociallife.launcher",
     "productName": "Social Life Launcher",
     "files": [
-      "dist/**",
-      "index.html",
-      "assets/**",
-      "images/**"
+      "dist/**"
     ],
     "directories": {
-      "output": "dist"
+      "output": "release"
     },
     "win": {
       "target": [

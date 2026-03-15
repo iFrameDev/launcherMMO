@@ -26,6 +26,6 @@ jobs:
 
       # Build et publication avec Electron Builder
       - name: Build and Publish
-        run: npm run build && npx electron-builder --publish always
+        run: npm run build && npx electron-builder --publish always --win
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
