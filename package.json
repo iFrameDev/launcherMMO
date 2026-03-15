@@ -1,6 +1,6 @@
 {
   "name": "sociallife-launcher",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Launcher minimaliste et moderne pour Social Life (Electron + React + Tailwind)",
   "main": "dist/main/main.js",

@@ -39,11 +39,6 @@ export function GamePanel({ gamePath }: GamePanelProps) {
               La simulation de vie multijoueur où vos choix façonnent une ville vivante. Métiers, relations, économie et événements en temps réel.
             </p>
 
-            {/* News ticker */}
-            <div className="mt-6 flex items-center gap-3">
-              <span className="px-2 py-1 rounded-md bg-sky-500/20 text-sky-300 text-[10px] font-semibold uppercase">Nouveau</span>
-              <span className="text-xs text-white/60">Patch 0.2 — Nouveaux métiers disponibles</span>
-            </div>
           </div>
 
           {/* Play button */}
