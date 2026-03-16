@@ -1,36 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../hooks/useToast';
 
-type SettingsPanelProps = {
-  gamePath: string | null;
-  launchArgs: string;
-  onConfigChange: (cfg: { gameExecutablePath?: string; launchArgs?: string }) => void;
-};
-
-export function SettingsPanel({ gamePath, launchArgs, onConfigChange }: SettingsPanelProps) {
-  const [args, setArgs] = useState(launchArgs);
+export function SettingsPanel() {
+  const [args, setArgs] = useState('');
+  const [installPath, setInstallPath] = useState<string | null>(null);
   const [version, setVersion] = useState('');
   const { showToast } = useToast();
 
   useEffect(() => {
+    window.launcher.getConfig().then((cfg) => {
+      if (cfg.launchArgs) setArgs(cfg.launchArgs);
+      if (cfg.gameInstallPath) setInstallPath(cfg.gameInstallPath);
+    });
     window.launcher.getVersion().then((v) => setVersion(v)).catch(() => {});
   }, []);
 
-  const handleChoosePath = async () => {
-    try {
-      const chosen = await window.launcher.chooseExecutable();
-      if (!chosen) return;
-      await window.launcher.setConfig({ gameExecutablePath: chosen });
-      onConfigChange({ gameExecutablePath: chosen });
-      showToast('Chemin du jeu enregistré', 'success');
-    } catch {
-      showToast('Erreur lors de la sélection', 'error');
-    }
-  };
-
   const handleSaveArgs = async () => {
     await window.launcher.setConfig({ launchArgs: args });
-    onConfigChange({ launchArgs: args });
     showToast('Arguments sauvegardés', 'success');
   };
 
@@ -54,16 +40,11 @@ export function SettingsPanel({ gamePath, launchArgs, onConfigChange }: Settings
       <div className="mt-8 max-w-lg space-y-4">
         <div className="rounded-xl border border-white/5 bg-white/[0.03] p-5">
           <h3 className="text-[11px] text-white/40 uppercase tracking-wider font-semibold mb-4">Jeu</h3>
-          <div className="flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-[11px] text-white/30">Chemin de l'exécutable</p>
-              <p className="mt-1 text-xs text-white/70 truncate">{gamePath ?? 'Non défini'}</p>
-            </div>
-            <button onClick={handleChoosePath} className="flex-shrink-0 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 px-4 py-2 text-[11px] font-medium transition-colors">
-              Parcourir
-            </button>
+          <div className="mb-3">
+            <p className="text-[11px] text-white/30">Dossier d'installation</p>
+            <p className="mt-1 text-xs text-white/70 truncate">{installPath ?? 'Non installé'}</p>
           </div>
-          <div className="mt-4 flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <input
               value={args}
               onChange={(e) => setArgs(e.target.value)}

@@ -1,6 +1,6 @@
 {
   "name": "sociallife-launcher",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "description": "Launcher minimaliste et moderne pour Social Life (Electron + React + Tailwind)",
   "main": "dist/main/main.js",
@@ -14,7 +14,8 @@
     "release": "npm run build && electron-builder"
   },
   "dependencies": {
-    "electron-updater": "^6.6.2"
+    "electron-updater": "^6.6.2",
+    "extract-zip": "^2.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.7.4",

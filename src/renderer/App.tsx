@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ToastProvider } from './hooks/useToast';
 import { TitleBar } from './components/TitleBar';
 import { NavBar } from './components/NavBar';
@@ -16,23 +16,9 @@ export type View = 'game' | 'store' | 'friends' | 'settings' | 'profile';
 function AppContent() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [view, setView] = useState<View>('game');
-  const [gamePath, setGamePath] = useState<string | null>(null);
-  const [launchArgs, setLaunchArgs] = useState('');
-
-  useEffect(() => {
-    window.launcher.getConfig().then((cfg) => {
-      if (cfg.gameExecutablePath) setGamePath(cfg.gameExecutablePath);
-      if (cfg.launchArgs) setLaunchArgs(cfg.launchArgs);
-    });
-  }, []);
-
-  const handleConfigChange = (cfg: { gameExecutablePath?: string; launchArgs?: string }) => {
-    if (cfg.gameExecutablePath !== undefined) setGamePath(cfg.gameExecutablePath);
-    if (cfg.launchArgs !== undefined) setLaunchArgs(cfg.launchArgs);
-  };
 
   return (
-    <div className={`h-screen overflow-hidden text-white relative bg-transparent`}>
+    <div className="h-screen overflow-hidden text-white relative bg-transparent">
       <UpdateOverlay />
       <ToastContainer />
 
@@ -41,7 +27,6 @@ function AppContent() {
           <div className="relative z-20">
             <TitleBar />
           </div>
-          {/* Login: full screen artwork background */}
           <div className="absolute inset-0 z-0">
             <div className="h-full w-full bg-cover bg-center brightness-[1.8]" style={{ backgroundImage: "url('./images/image.png')" }} />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-700/60 via-transparent to-transparent" />
@@ -52,22 +37,19 @@ function AppContent() {
         </>
       ) : (
         <div className="h-full flex flex-col relative">
-          {/* Background image */}
           <div className="absolute inset-0 -z-10">
             <div className="h-full w-full bg-cover bg-center brightness-[1.8]" style={{ backgroundImage: "url('./images/image.png')" }} />
             <div className="absolute inset-0 bg-black/30" />
           </div>
 
-          {/* Title bar + Nav combined */}
           <TitleBar />
           <NavBar activeView={view} onNavigate={setView} />
 
-          {/* Content */}
           <main className="flex-1 overflow-hidden">
-            {view === 'game' && <GamePanel gamePath={gamePath} />}
+            {view === 'game' && <GamePanel />}
             {view === 'store' && <StorePanel />}
             {view === 'friends' && <FriendsPanel />}
-            {view === 'settings' && <SettingsPanel gamePath={gamePath} launchArgs={launchArgs} onConfigChange={handleConfigChange} />}
+            {view === 'settings' && <SettingsPanel />}
             {view === 'profile' && <ProfilePanel />}
           </main>
         </div>
